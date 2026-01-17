@@ -1,53 +1,45 @@
 #!/usr/bin/env python3
 
-from random import randint
-
-from faker import Faker
-
 from app import app
 from models import db, Article, User
 
-fake = Faker()
-
 with app.app_context():
+    
+    print("Creating tables...")
+    db.create_all()
 
     print("Deleting all records...")
     Article.query.delete()
     User.query.delete()
 
-    fake = Faker()
-
     print("Creating users...")
-    users = []
-    usernames = []
-    for i in range(25):
-
-        username = fake.first_name()
-        while username in usernames:
-            username = fake.first_name()
-        
-        usernames.append(username)
-
-        user = User(username=username)
-        users.append(user)
+    users = [
+        User(username="testuser"),
+        User(username="alice"),
+        User(username="bob"),
+    ]
 
     db.session.add_all(users)
 
     print("Creating articles...")
-    articles = []
-    for i in range(100):
-        content = fake.paragraph(nb_sentences=8)
-        preview = content[:25] + '...'
-        
-        article = Article(
-            author=fake.name(),
-            title=fake.sentence(),
-            content=content,
-            preview=preview,
-            minutes_to_read=randint(1,20),
-        )
-
-        articles.append(article)
+    articles = [
+        Article(
+            author="Test Author",
+            title="Test Article 1",
+            content="This is a test article content for testing purposes.",
+            preview="This is a test...",
+            minutes_to_read=5,
+            user_id=1
+        ),
+        Article(
+            author="Another Author",
+            title="Test Article 2", 
+            content="Another test article with different content for testing.",
+            preview="Another test...",
+            minutes_to_read=3,
+            user_id=2
+        ),
+    ]
 
     db.session.add_all(articles)
     
